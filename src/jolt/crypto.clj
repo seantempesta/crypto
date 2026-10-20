@@ -1051,16 +1051,16 @@
                  (#{"java.security.cert.X509Certificate" "X509Certificate"
                     "java.security.cert.Certificate" "Certificate"
                     "java.security.cert.X509Extension" "X509Extension"} cn))
-        true)))
+        true)) {:kind :table})
   (__register-class! x509-cert?
                      (fn [_] "java.security.cert.X509Certificate")
                      (fn [_] ["java.security.cert.X509Certificate" "java.security.cert.Certificate"
-                              "java.security.cert.X509Extension" "java.io.Serializable"]))
+                              "java.security.cert.X509Extension" "java.io.Serializable"]) {:kind :table})
   (__register-eq! (fn [a b] (or (x509-cert? a) (x509-cert? b)))
-                  (fn [a b] (and (x509-cert? a) (x509-cert? b) (ba= (tget a :der) (tget b :der)))))
-  (__register-hash! x509-cert? (fn [c] (hash (seq (tget c :der)))))
-  (__register-str! x509-cert? (fn [c] (x509-cert-string c)))
-  (__register-pr! x509-cert? (fn [c] (x509-cert-string c)))
+                  (fn [a b] (and (x509-cert? a) (x509-cert? b) (ba= (tget a :der) (tget b :der)))) {:kind :table})
+  (__register-hash! x509-cert? (fn [c] (hash (seq (tget c :der)))) {:kind :table})
+  (__register-str! x509-cert? (fn [c] (x509-cert-string c)) {:kind :table})
+  (__register-pr! x509-cert? (fn [c] (x509-cert-string c)) {:kind :table})
   (__register-class-methods! :jolt.crypto/x509-cert
     {"getType" (fn [self] "X.509")
      "getEncoded" (fn [self] (aclone (tget self :der)))
@@ -1104,17 +1104,17 @@
                  (or (#{"java.security.Principal" "Principal"} cn)
                      (and (= :jolt.crypto/x500-principal (tget val :jolt/type))
                           (#{"javax.security.auth.x500.X500Principal" "X500Principal"} cn))))
-        true)))
+        true)) {:kind :table})
   (__register-class! x500-principal?
                      (fn [_] "javax.security.auth.x500.X500Principal")
-                     (fn [_] ["javax.security.auth.x500.X500Principal" "java.security.Principal" "java.io.Serializable"]))
+                     (fn [_] ["javax.security.auth.x500.X500Principal" "java.security.Principal" "java.io.Serializable"]) {:kind :table})
   (__register-eq! (fn [a b] (or (x500-principal? a) (x500-principal? b)))
-                  (fn [a b] (and (x500-principal? a) (x500-principal? b) (= (tget a :name) (tget b :name)))))
-  (__register-hash! x500-principal? (fn [p] (hash (tget p :name))))
-  (__register-str! x500-principal? (fn [p] (rfc2253->rfc1779 (tget p :name))))
-  (__register-pr! x500-principal? (fn [p] (rfc2253->rfc1779 (tget p :name))))
-  (__register-str! x500-name? (fn [p] (rfc2253->rfc1779 (tget p :name))))
-  (__register-pr! x500-name? (fn [p] (rfc2253->rfc1779 (tget p :name))))
+                  (fn [a b] (and (x500-principal? a) (x500-principal? b) (= (tget a :name) (tget b :name)))) {:kind :table})
+  (__register-hash! x500-principal? (fn [p] (hash (tget p :name))) {:kind :table})
+  (__register-str! x500-principal? (fn [p] (rfc2253->rfc1779 (tget p :name))) {:kind :table})
+  (__register-pr! x500-principal? (fn [p] (rfc2253->rfc1779 (tget p :name))) {:kind :table})
+  (__register-str! x500-name? (fn [p] (rfc2253->rfc1779 (tget p :name))) {:kind :table})
+  (__register-pr! x500-name? (fn [p] (rfc2253->rfc1779 (tget p :name))) {:kind :table})
   (__register-class-methods! :jolt.crypto/x500-principal
     {"getName" (fn [self & [format]]
                  (case (some-> format str str/upper-case)
