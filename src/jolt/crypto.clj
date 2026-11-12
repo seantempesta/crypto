@@ -237,15 +237,17 @@
                (finally (ffi/free mdp))))))))
 
 ;; --- digest -----------------------------------------------------------------
+;; One block holds the digest (64 bytes, EVP_MAX_MD_SIZE), its length (4) and the input: one
+;; alloc, one copy in, one copy out. Three allocs and with-ptrs's vector, apply and closures
+;; were ~1.5 KB of a 37-byte key's 2.2 KB (konserve's key->store-key, once per read).
 (defn digest [md-fn outlen data]
-  (let [data (as-ba data) dl (alength data)]
-    (with-ptrs [data]
-      (fn [dp]
-        (let [mdp (ffi/alloc 64) lenp (ffi/alloc 4)]
-          (try (when (not= 1 (c-digest dp dl mdp lenp (md-fn) ffi/null))
-                 (throw (ex-info "digest failed" {})))
-               (ffi/read-array mdp outlen)
-               (finally (ffi/free mdp) (ffi/free lenp))))))))
+  (let [data (as-ba data) dl (alength data)
+        mdp (ffi/alloc (+ 68 (max 1 dl))) lenp (+ mdp 64) dp (+ mdp 68)]
+    (try (ffi/write-array dp data)
+         (when (not= 1 (c-digest dp dl mdp lenp (md-fn) ffi/null))
+           (throw (ex-info "digest failed" {})))
+         (ffi/read-array mdp outlen)
+         (finally (ffi/free mdp)))))
 
 (defn random-bytes [n]
   (let [p (ffi/alloc (max 1 n))]
